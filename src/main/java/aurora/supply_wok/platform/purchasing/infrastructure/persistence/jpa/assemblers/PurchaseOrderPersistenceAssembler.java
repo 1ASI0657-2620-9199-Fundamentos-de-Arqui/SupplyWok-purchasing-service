@@ -22,6 +22,7 @@ public final class PurchaseOrderPersistenceAssembler {
 
         var order = new PurchaseOrder();
         order.setId(entity.getId());
+        order.setRestaurantId(entity.getRestaurantId());
         order.setCode(entity.getCode());
         order.setSupplierId(entity.getSupplierId());
         order.setSupplierName(entity.getSupplierName());
@@ -55,6 +56,7 @@ public final class PurchaseOrderPersistenceAssembler {
         if (order.getId() != null) {
             entity.setId(order.getId());
         }
+        entity.setRestaurantId(order.getRestaurantId());
         entity.setCode(order.getCode());
         entity.setSupplierId(order.getSupplierId());
         entity.setSupplierName(order.getSupplierName());

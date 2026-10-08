@@ -11,4 +11,8 @@ public class UpdatePurchaseOrderStatusCommandFromResourceAssembler {
     public static UpdatePurchaseOrderStatusCommand toCommandFromResource(Long purchaseOrderId, UpdatePurchaseOrderStatusResource resource) {
         return new UpdatePurchaseOrderStatusCommand(purchaseOrderId, resource.status());
     }
+
+    public static UpdatePurchaseOrderStatusCommand toCommandFromResource(Long purchaseOrderId, UpdatePurchaseOrderStatusResource resource, Long restaurantId, Long supplierId) {
+        return new UpdatePurchaseOrderStatusCommand(purchaseOrderId, resource.status(), restaurantId, supplierId);
+    }
 }

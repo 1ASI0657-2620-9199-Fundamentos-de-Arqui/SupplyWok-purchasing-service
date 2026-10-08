@@ -13,8 +13,21 @@ public record PurchaseOrderStatusChangedEvent(
         String supplierName,
         String restaurantName,
         EPurchaseOrderStatus previousStatus,
-        EPurchaseOrderStatus currentStatus
+        EPurchaseOrderStatus currentStatus,
+        Long restaurantId
 ) {
+    public PurchaseOrderStatusChangedEvent(
+            Long purchaseOrderId,
+            String code,
+            Long supplierId,
+            String supplierName,
+            String restaurantName,
+            EPurchaseOrderStatus previousStatus,
+            EPurchaseOrderStatus currentStatus
+    ) {
+        this(purchaseOrderId, code, supplierId, supplierName, restaurantName, previousStatus, currentStatus, 1L);
+    }
+
     public static PurchaseOrderStatusChangedEvent from(PurchaseOrder purchaseOrder, EPurchaseOrderStatus previousStatus) {
         return new PurchaseOrderStatusChangedEvent(
                 purchaseOrder.getId(),
@@ -23,7 +36,8 @@ public record PurchaseOrderStatusChangedEvent(
                 purchaseOrder.getSupplierName(),
                 purchaseOrder.getRestaurantName(),
                 previousStatus,
-                purchaseOrder.getStatus()
+                purchaseOrder.getStatus(),
+                purchaseOrder.getRestaurantId()
         );
     }
 }

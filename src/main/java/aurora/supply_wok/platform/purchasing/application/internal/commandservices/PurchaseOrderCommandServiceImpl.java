@@ -38,6 +38,10 @@ public class PurchaseOrderCommandServiceImpl implements PurchaseOrderCommandServ
 
     @Override
     public Optional<PurchaseOrder> handle(CreatePurchaseOrderCommand command) {
+        if (command.restaurantId() != null && command.restaurantId() <= 0) {
+            throw new IllegalArgumentException("Restaurant id must be greater than zero.");
+        }
+
         var supplierName = suppliersContextFacade.getSupplierIdentityById(command.supplierId())
                 .map(supplierIdentity -> supplierIdentity.name())
                 .filter(name -> !name.isBlank());
@@ -73,7 +77,9 @@ public class PurchaseOrderCommandServiceImpl implements PurchaseOrderCommandServ
 
     @Override
     public Optional<PurchaseOrder> handle(UpdatePurchaseOrderCommand command) {
-        var order = purchaseOrderRepository.findById(command.id());
+        var order = command.restaurantId() != null
+                ? purchaseOrderRepository.findByIdAndRestaurantId(command.id(), command.restaurantId())
+                : purchaseOrderRepository.findById(command.id());
         if (order.isEmpty()) {
             return Optional.empty();
         }
@@ -123,7 +129,11 @@ public class PurchaseOrderCommandServiceImpl implements PurchaseOrderCommandServ
 
     @Override
     public Optional<PurchaseOrder> handle(UpdatePurchaseOrderStatusCommand command) {
-        var order = purchaseOrderRepository.findById(command.id());
+        var order = command.restaurantId() != null
+                ? purchaseOrderRepository.findByIdAndRestaurantId(command.id(), command.restaurantId())
+                : (command.supplierId() != null
+                ? purchaseOrderRepository.findByIdAndSupplierId(command.id(), command.supplierId())
+                : purchaseOrderRepository.findById(command.id()));
         if (order.isEmpty()) {
             return Optional.empty();
         }
@@ -135,7 +145,9 @@ public class PurchaseOrderCommandServiceImpl implements PurchaseOrderCommandServ
 
     @Override
     public boolean handle(DeletePurchaseOrderCommand command) {
-        var order = purchaseOrderRepository.findById(command.id());
+        var order = command.restaurantId() != null
+                ? purchaseOrderRepository.findByIdAndRestaurantId(command.id(), command.restaurantId())
+                : purchaseOrderRepository.findById(command.id());
         if (order.isEmpty()) {
             return false;
         }

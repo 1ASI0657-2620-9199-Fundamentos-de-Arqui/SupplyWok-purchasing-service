@@ -24,6 +24,9 @@ public class PurchaseOrder extends AbstractDomainAggregateRoot<PurchaseOrder> {
     private Long id;
 
     @Setter
+    private Long restaurantId;
+
+    @Setter
     private String code;
 
     @Setter
@@ -51,6 +54,7 @@ public class PurchaseOrder extends AbstractDomainAggregateRoot<PurchaseOrder> {
     private List<PurchaseOrderItem> items;
 
     public PurchaseOrder() {
+        this.restaurantId = 1L;
         this.code = "";
         this.supplierId = 0L;
         this.supplierName = "";
@@ -71,7 +75,8 @@ public class PurchaseOrder extends AbstractDomainAggregateRoot<PurchaseOrder> {
             LocalDate estimatedDate,
             EPurchaseOrderPriority priority,
             EPurchaseOrderStatus status,
-            List<PurchaseOrderItem> items
+            List<PurchaseOrderItem> items,
+            Long restaurantId
     ) {
         this();
         this.code = code;
@@ -82,7 +87,22 @@ public class PurchaseOrder extends AbstractDomainAggregateRoot<PurchaseOrder> {
         this.estimatedDate = estimatedDate;
         this.priority = priority;
         this.status = status;
+        this.restaurantId = restaurantId != null ? restaurantId : 1L;
         replaceItems(items);
+    }
+
+    public PurchaseOrder(
+            String code,
+            Long supplierId,
+            String supplierName,
+            String restaurantName,
+            LocalDate orderDate,
+            LocalDate estimatedDate,
+            EPurchaseOrderPriority priority,
+            EPurchaseOrderStatus status,
+            List<PurchaseOrderItem> items
+    ) {
+        this(code, supplierId, supplierName, restaurantName, orderDate, estimatedDate, priority, status, items, 1L);
     }
 
     public PurchaseOrder(CreatePurchaseOrderCommand command, String resolvedSupplierName,
@@ -97,7 +117,8 @@ public class PurchaseOrder extends AbstractDomainAggregateRoot<PurchaseOrder> {
                 command.estimatedDate(),
                 resolvedPriority,
                 resolvedStatus,
-                items
+                items,
+                command.restaurantId()
         );
     }
 

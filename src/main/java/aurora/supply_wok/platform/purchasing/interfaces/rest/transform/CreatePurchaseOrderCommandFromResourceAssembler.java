@@ -11,6 +11,10 @@ import aurora.supply_wok.platform.purchasing.interfaces.rest.resources.PurchaseO
 public class CreatePurchaseOrderCommandFromResourceAssembler {
 
     public static CreatePurchaseOrderCommand toCommandFromResource(CreatePurchaseOrderResource resource) {
+        return toCommandFromResource(resource, 1L);
+    }
+
+    public static CreatePurchaseOrderCommand toCommandFromResource(CreatePurchaseOrderResource resource, Long restaurantId) {
         return new CreatePurchaseOrderCommand(
                 resource.code(),
                 resource.supplierId(),
@@ -20,7 +24,8 @@ public class CreatePurchaseOrderCommandFromResourceAssembler {
                 resource.estimatedDate(),
                 resource.priority(),
                 resource.status(),
-                resource.items().stream().map(CreatePurchaseOrderCommandFromResourceAssembler::toItemCommand).toList()
+                resource.items().stream().map(CreatePurchaseOrderCommandFromResourceAssembler::toItemCommand).toList(),
+                restaurantId
         );
     }
 

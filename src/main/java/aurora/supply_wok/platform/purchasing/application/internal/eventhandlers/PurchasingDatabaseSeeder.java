@@ -5,6 +5,7 @@ import aurora.supply_wok.platform.purchasing.domain.model.commands.CreatePurchas
 import aurora.supply_wok.platform.purchasing.domain.model.commands.CreatePurchaseOrderItemCommand;
 import aurora.supply_wok.platform.purchasing.infrastructure.persistence.jpa.repositories.PurchaseOrderPersistenceRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,15 @@ import java.util.List;
 public class PurchasingDatabaseSeeder {
     private final PurchaseOrderPersistenceRepository purchaseOrderPersistenceRepository;
     private final PurchaseOrderCommandService purchaseOrderCommandService;
+    private final Long restaurantOwnerId;
 
     public PurchasingDatabaseSeeder(
             PurchaseOrderPersistenceRepository purchaseOrderPersistenceRepository,
-            PurchaseOrderCommandService purchaseOrderCommandService) {
+            PurchaseOrderCommandService purchaseOrderCommandService,
+            @Value("${supplywok.seed.restaurant-owner-id:1}") Long restaurantOwnerId) {
         this.purchaseOrderPersistenceRepository = purchaseOrderPersistenceRepository;
         this.purchaseOrderCommandService = purchaseOrderCommandService;
+        this.restaurantOwnerId = restaurantOwnerId;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -46,7 +50,8 @@ public class PurchasingDatabaseSeeder {
                             BigDecimal.valueOf(20),
                             BigDecimal.valueOf(2.50),
                             "KG"
-                    ))
+                    )),
+                    restaurantOwnerId
             ));
             log.info("Purchase orders seeded successfully.");
         }

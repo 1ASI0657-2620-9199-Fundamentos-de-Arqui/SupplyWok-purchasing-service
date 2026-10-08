@@ -11,9 +11,15 @@ import java.util.Optional;
 public interface PurchaseOrderRepository {
     List<PurchaseOrder> findAll();
 
+    List<PurchaseOrder> findAllByRestaurantId(Long restaurantId);
+
     List<PurchaseOrder> findAllBySupplierId(Long supplierId);
 
     Optional<PurchaseOrder> findById(Long purchaseOrderId);
+
+    Optional<PurchaseOrder> findByIdAndRestaurantId(Long purchaseOrderId, Long restaurantId);
+
+    Optional<PurchaseOrder> findByIdAndSupplierId(Long purchaseOrderId, Long supplierId);
 
     boolean existsByCode(String code);
 

@@ -18,11 +18,20 @@ public interface PurchaseOrderPersistenceRepository extends JpaRepository<Purcha
     List<PurchaseOrderPersistenceEntity> findAllByOrderByIdAsc();
 
     @EntityGraph(attributePaths = "items")
+    List<PurchaseOrderPersistenceEntity> findAllByRestaurantIdOrderByIdAsc(Long restaurantId);
+
+    @EntityGraph(attributePaths = "items")
     List<PurchaseOrderPersistenceEntity> findAllBySupplierIdOrderByIdAsc(Long supplierId);
 
     @Override
     @EntityGraph(attributePaths = "items")
     Optional<PurchaseOrderPersistenceEntity> findById(Long purchaseOrderId);
+
+    @EntityGraph(attributePaths = "items")
+    Optional<PurchaseOrderPersistenceEntity> findByIdAndRestaurantId(Long purchaseOrderId, Long restaurantId);
+
+    @EntityGraph(attributePaths = "items")
+    Optional<PurchaseOrderPersistenceEntity> findByIdAndSupplierId(Long purchaseOrderId, Long supplierId);
 
     boolean existsByCode(String code);
 

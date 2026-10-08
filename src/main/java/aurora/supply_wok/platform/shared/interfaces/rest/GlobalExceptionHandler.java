@@ -66,6 +66,60 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles access denied exceptions thrown when a user lacks required permissions.
+     * Maps to FORBIDDEN status (403).
+     *
+     * @param ex the access denied exception
+     * @return error response with FORBIDDEN status
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<aurora.supply_wok.platform.shared.interfaces.rest.resources.ErrorResource> handleAccessDeniedException(
+            org.springframework.security.access.AccessDeniedException ex) {
+        var errorResource = new aurora.supply_wok.platform.shared.interfaces.rest.resources.ErrorResource(
+                "ACCESS_DENIED",
+                ex.getMessage() != null ? ex.getMessage() : "Access denied",
+                null
+        );
+        return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN).body(errorResource);
+    }
+
+    /**
+     * Handles resource not found exceptions when a requested resource does not exist or is in another tenant.
+     * Maps to NOT_FOUND status (404).
+     *
+     * @param ex the resource not found exception
+     * @return error response with NOT_FOUND status
+     */
+    @ExceptionHandler(aurora.supply_wok.platform.shared.infrastructure.security.ResourceNotFoundException.class)
+    public ResponseEntity<aurora.supply_wok.platform.shared.interfaces.rest.resources.ErrorResource> handleResourceNotFoundException(
+            aurora.supply_wok.platform.shared.infrastructure.security.ResourceNotFoundException ex) {
+        var errorResource = new aurora.supply_wok.platform.shared.interfaces.rest.resources.ErrorResource(
+                "RESOURCE_NOT_FOUND",
+                ex.getMessage() != null ? ex.getMessage() : "Resource not found",
+                null
+        );
+        return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).body(errorResource);
+    }
+
+    /**
+     * Handles authentication exceptions when user is unauthenticated.
+     * Maps to UNAUTHORIZED status (401).
+     *
+     * @param ex the authentication exception
+     * @return error response with UNAUTHORIZED status
+     */
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<aurora.supply_wok.platform.shared.interfaces.rest.resources.ErrorResource> handleAuthenticationException(
+            org.springframework.security.core.AuthenticationException ex) {
+        var errorResource = new aurora.supply_wok.platform.shared.interfaces.rest.resources.ErrorResource(
+                "UNAUTHORIZED",
+                ex.getMessage() != null ? ex.getMessage() : "Authentication required",
+                null
+        );
+        return org.springframework.http.ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body(errorResource);
+    }
+
+    /**
      * Handles unexpected runtime exceptions not caught by specific handlers.
      * Maps to a generic unexpected error response.
      *

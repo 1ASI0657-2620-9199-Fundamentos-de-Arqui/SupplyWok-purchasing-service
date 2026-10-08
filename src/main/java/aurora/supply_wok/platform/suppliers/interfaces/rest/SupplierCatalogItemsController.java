@@ -1,10 +1,12 @@
 package aurora.supply_wok.platform.suppliers.interfaces.rest;
 
+import aurora.supply_wok.platform.shared.infrastructure.security.CurrentUserProvider;
 import aurora.supply_wok.platform.suppliers.application.commandservices.CatalogItemCommandService;
 import aurora.supply_wok.platform.suppliers.application.queryservices.CatalogItemQueryService;
 import aurora.supply_wok.platform.suppliers.domain.model.commands.DeleteCatalogItemCommand;
 import aurora.supply_wok.platform.suppliers.domain.model.queries.GetAllCatalogItemsBySupplierIdQuery;
 import aurora.supply_wok.platform.suppliers.domain.model.queries.GetCatalogItemByIdQuery;
+import aurora.supply_wok.platform.suppliers.domain.repositories.SupplierRepository;
 import aurora.supply_wok.platform.suppliers.interfaces.rest.resources.CatalogItemResource;
 import aurora.supply_wok.platform.suppliers.interfaces.rest.resources.CreateCatalogItemResource;
 import aurora.supply_wok.platform.suppliers.interfaces.rest.resources.UpdateCatalogItemResource;
@@ -22,6 +24,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * REST controller that exposes supplier catalog endpoints.
+ * REST controller that exposes supplier catalog endpoints with supplier ownership authorization.
  */
 @RestController
 @RequestMapping(value = "/api/v1/suppliers/{supplierId}/catalog-items", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,10 +46,32 @@ public class SupplierCatalogItemsController {
 
     private final CatalogItemCommandService catalogItemCommandService;
     private final CatalogItemQueryService catalogItemQueryService;
+    private final CurrentUserProvider currentUserProvider;
+    private final SupplierRepository supplierRepository;
 
-    public SupplierCatalogItemsController(CatalogItemCommandService catalogItemCommandService, CatalogItemQueryService catalogItemQueryService) {
+    public SupplierCatalogItemsController(
+            CatalogItemCommandService catalogItemCommandService,
+            CatalogItemQueryService catalogItemQueryService,
+            CurrentUserProvider currentUserProvider,
+            SupplierRepository supplierRepository) {
         this.catalogItemCommandService = catalogItemCommandService;
         this.catalogItemQueryService = catalogItemQueryService;
+        this.currentUserProvider = currentUserProvider;
+        this.supplierRepository = supplierRepository;
+    }
+
+    private void verifySupplierOwnership(Long supplierId) {
+        var user = currentUserProvider.get();
+        if (user.hasRole("ADMIN")) {
+            return;
+        }
+        if (!user.hasRole("SUPPLIER")) {
+            throw new AccessDeniedException("User is not a supplier");
+        }
+        var supplier = supplierRepository.findByEmailIgnoreCase(user.email());
+        if (supplier.isEmpty() || !supplier.get().getId().equals(supplierId)) {
+            throw new AccessDeniedException("User is not authorized to modify catalog items for supplier " + supplierId);
+        }
     }
 
     @PostMapping
@@ -54,6 +79,7 @@ public class SupplierCatalogItemsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Catalog item created successfully", content = @Content(schema = @Schema(implementation = CatalogItemResource.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: not the owning supplier"),
             @ApiResponse(responseCode = "404", description = "Supplier not found")
     })
     public ResponseEntity<CatalogItemResource> createCatalogItem(
@@ -62,6 +88,8 @@ public class SupplierCatalogItemsController {
             Long supplierId,
             @Valid @RequestBody CreateCatalogItemResource resource
     ) {
+        verifySupplierOwnership(supplierId);
+
         try {
             var command = CreateCatalogItemCommandFromResourceAssembler.toCommandFromResource(supplierId, resource);
             var catalogItemId = catalogItemCommandService.handle(command);
@@ -132,6 +160,7 @@ public class SupplierCatalogItemsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Catalog item updated successfully", content = @Content(schema = @Schema(implementation = CatalogItemResource.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: not the owning supplier"),
             @ApiResponse(responseCode = "404", description = "Supplier or catalog item not found")
     })
     public ResponseEntity<CatalogItemResource> updateCatalogItem(
@@ -143,6 +172,8 @@ public class SupplierCatalogItemsController {
             Long catalogItemId,
             @Valid @RequestBody UpdateCatalogItemResource resource
     ) {
+        verifySupplierOwnership(supplierId);
+
         try {
             var command = UpdateCatalogItemCommandFromResourceAssembler.toCommandFromResource(supplierId, catalogItemId, resource);
             var catalogItem = catalogItemCommandService.handle(command);
@@ -162,6 +193,7 @@ public class SupplierCatalogItemsController {
     @Operation(summary = "Delete a catalog item", description = "Deletes a catalog item owned by the specified supplier.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Catalog item deleted successfully"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: not the owning supplier"),
             @ApiResponse(responseCode = "404", description = "Supplier or catalog item not found")
     })
     public ResponseEntity<Void> deleteCatalogItem(
@@ -172,6 +204,8 @@ public class SupplierCatalogItemsController {
             @Parameter(description = "Catalog item unique identifier", example = "1", required = true)
             Long catalogItemId
     ) {
+        verifySupplierOwnership(supplierId);
+
         var deleted = catalogItemCommandService.handle(new DeleteCatalogItemCommand(supplierId, catalogItemId));
         if (!deleted) {
             return ResponseEntity.notFound().build();

@@ -16,6 +16,21 @@ public record UpdatePurchaseOrderCommand(
         LocalDate estimatedDate,
         String priority,
         String status,
-        List<CreatePurchaseOrderItemCommand> items
+        List<CreatePurchaseOrderItemCommand> items,
+        Long restaurantId
 ) {
+    public UpdatePurchaseOrderCommand(
+            Long id,
+            String code,
+            Long supplierId,
+            String supplierName,
+            String restaurantName,
+            LocalDate orderDate,
+            LocalDate estimatedDate,
+            String priority,
+            String status,
+            List<CreatePurchaseOrderItemCommand> items
+    ) {
+        this(id, code, supplierId, supplierName, restaurantName, orderDate, estimatedDate, priority, status, items, null);
+    }
 }

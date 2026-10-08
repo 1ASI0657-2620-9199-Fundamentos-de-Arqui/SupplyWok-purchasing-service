@@ -12,8 +12,21 @@ public record PurchaseOrderCreatedEvent(
         String supplierName,
         String restaurantName,
         String priority,
-        String status
+        String status,
+        Long restaurantId
 ) {
+    public PurchaseOrderCreatedEvent(
+            Long purchaseOrderId,
+            String code,
+            Long supplierId,
+            String supplierName,
+            String restaurantName,
+            String priority,
+            String status
+    ) {
+        this(purchaseOrderId, code, supplierId, supplierName, restaurantName, priority, status, 1L);
+    }
+
     public static PurchaseOrderCreatedEvent from(PurchaseOrder purchaseOrder) {
         return new PurchaseOrderCreatedEvent(
                 purchaseOrder.getId(),
@@ -22,7 +35,8 @@ public record PurchaseOrderCreatedEvent(
                 purchaseOrder.getSupplierName(),
                 purchaseOrder.getRestaurantName(),
                 purchaseOrder.getPriority().name(),
-                purchaseOrder.getStatus().name()
+                purchaseOrder.getStatus().name(),
+                purchaseOrder.getRestaurantId()
         );
     }
 }

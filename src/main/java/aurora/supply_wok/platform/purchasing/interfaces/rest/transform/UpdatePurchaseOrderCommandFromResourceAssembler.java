@@ -11,6 +11,10 @@ import aurora.supply_wok.platform.purchasing.interfaces.rest.resources.UpdatePur
 public class UpdatePurchaseOrderCommandFromResourceAssembler {
 
     public static UpdatePurchaseOrderCommand toCommandFromResource(Long purchaseOrderId, UpdatePurchaseOrderResource resource) {
+        return toCommandFromResource(purchaseOrderId, resource, null);
+    }
+
+    public static UpdatePurchaseOrderCommand toCommandFromResource(Long purchaseOrderId, UpdatePurchaseOrderResource resource, Long restaurantId) {
         return new UpdatePurchaseOrderCommand(
                 purchaseOrderId,
                 resource.code(),
@@ -21,7 +25,8 @@ public class UpdatePurchaseOrderCommandFromResourceAssembler {
                 resource.estimatedDate(),
                 resource.priority(),
                 resource.status(),
-                resource.items().stream().map(UpdatePurchaseOrderCommandFromResourceAssembler::toItemCommand).toList()
+                resource.items().stream().map(UpdatePurchaseOrderCommandFromResourceAssembler::toItemCommand).toList(),
+                restaurantId
         );
     }
 

@@ -31,6 +31,9 @@ public class PurchaseOrderPersistenceEntity extends AuditableAbstractPersistence
     @Column(nullable = false, length = 20, unique = true)
     private String code;
 
+    @Column(name = "restaurant_id", nullable = false)
+    private Long restaurantId;
+
     @Column(name = "supplier_id", nullable = false)
     private Long supplierId;
 

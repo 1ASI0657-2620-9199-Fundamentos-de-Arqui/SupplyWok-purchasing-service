@@ -10,6 +10,8 @@ public record PurchaseOrderStatusChangedIntegrationEvent(
         String supplierName,
         String restaurantName,
         String previousStatus,
-        String currentStatus
+        String currentStatus,
+        Long restaurantId,
+        String supplierEmail
 ) {
 }

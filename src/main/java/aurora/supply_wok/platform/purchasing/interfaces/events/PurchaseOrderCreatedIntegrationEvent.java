@@ -10,6 +10,8 @@ public record PurchaseOrderCreatedIntegrationEvent(
         String supplierName,
         String restaurantName,
         String priority,
-        String status
+        String status,
+        Long restaurantId,
+        String supplierEmail
 ) {
 }

@@ -34,6 +34,14 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepository {
     }
 
     @Override
+    public List<PurchaseOrder> findAllByRestaurantId(Long restaurantId) {
+        return purchaseOrderPersistenceRepository.findAllByRestaurantIdOrderByIdAsc(restaurantId)
+                .stream()
+                .map(PurchaseOrderPersistenceAssembler::toDomainFromPersistence)
+                .toList();
+    }
+
+    @Override
     public List<PurchaseOrder> findAllBySupplierId(Long supplierId) {
         return purchaseOrderPersistenceRepository.findAllBySupplierIdOrderByIdAsc(supplierId)
                 .stream()
@@ -44,6 +52,18 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepository {
     @Override
     public Optional<PurchaseOrder> findById(Long purchaseOrderId) {
         return purchaseOrderPersistenceRepository.findById(purchaseOrderId)
+                .map(PurchaseOrderPersistenceAssembler::toDomainFromPersistence);
+    }
+
+    @Override
+    public Optional<PurchaseOrder> findByIdAndRestaurantId(Long purchaseOrderId, Long restaurantId) {
+        return purchaseOrderPersistenceRepository.findByIdAndRestaurantId(purchaseOrderId, restaurantId)
+                .map(PurchaseOrderPersistenceAssembler::toDomainFromPersistence);
+    }
+
+    @Override
+    public Optional<PurchaseOrder> findByIdAndSupplierId(Long purchaseOrderId, Long supplierId) {
+        return purchaseOrderPersistenceRepository.findByIdAndSupplierId(purchaseOrderId, supplierId)
                 .map(PurchaseOrderPersistenceAssembler::toDomainFromPersistence);
     }
 

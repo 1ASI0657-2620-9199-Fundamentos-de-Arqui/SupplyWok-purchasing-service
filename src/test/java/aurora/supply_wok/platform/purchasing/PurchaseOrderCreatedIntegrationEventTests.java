@@ -85,5 +85,7 @@ class PurchaseOrderCreatedIntegrationEventTests {
         assertThat(publishedEvent.restaurantName()).isEqualTo("Wok Central Miraflores");
         assertThat(publishedEvent.priority()).isEqualTo("High");
         assertThat(publishedEvent.status()).isEqualTo("Pending");
+        assertThat(publishedEvent.restaurantId()).isEqualTo(1L);
+        assertThat(publishedEvent.supplierEmail()).isEqualTo("insumos-chef-event-test@restaurante.com");
     }
 }
