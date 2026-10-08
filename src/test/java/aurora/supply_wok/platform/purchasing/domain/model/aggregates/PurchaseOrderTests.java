@@ -133,6 +133,19 @@ class PurchaseOrderTests {
     }
 
     @Test
+    void updateInformation_whenOrderIsNotPending_throwsIllegalArgumentException() {
+        // Arrange
+        var order = new PurchaseOrder();
+        order.setStatus(EPurchaseOrderStatus.Confirmed);
+
+        // Act & Assert
+        var exception = assertThrows(IllegalArgumentException.class, () -> order.updateInformation(
+                "PO-1", 1L, "Supplier", "Restaurant", LocalDate.of(2026, 10, 8), LocalDate.of(2026, 10, 9),
+                EPurchaseOrderPriority.High, EPurchaseOrderStatus.Confirmed, List.of()));
+        assertThat(exception.getMessage()).isEqualTo("Only pending purchase orders can be modified.");
+    }
+
+    @Test
     void updateInformation_whenStatusChanges_registersPurchaseOrderStatusChangedEvent() {
         // Arrange
         var order = new PurchaseOrder();

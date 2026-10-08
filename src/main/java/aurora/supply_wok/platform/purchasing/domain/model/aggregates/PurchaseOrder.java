@@ -112,6 +112,9 @@ public class PurchaseOrder extends AbstractDomainAggregateRoot<PurchaseOrder> {
             EPurchaseOrderStatus status,
             List<PurchaseOrderItem> items
     ) {
+        if (this.status != EPurchaseOrderStatus.Pending) {
+            throw new IllegalArgumentException("Only pending purchase orders can be modified.");
+        }
         var previousStatus = this.status;
         this.code = code;
         this.supplierId = supplierId;
