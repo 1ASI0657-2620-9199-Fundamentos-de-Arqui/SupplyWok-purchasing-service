@@ -23,7 +23,7 @@ public class MessagingConfiguration {
     public static final String EXCHANGE_NAME = "supplywok.events";
     public static final String QUEUE_NAME = "purchasing.events";
     public static final String ROUTING_KEY_PROFILES_PATTERN = "profiles.#";
-    private static final String TRUSTED_PACKAGE_PATTERN = "aurora.supply_wok.platform.*";
+    private static final String[] TRUSTED_PACKAGES = new String[] {"aurora.supply_wok.platform.purchasing.interfaces.events", "aurora.supply_wok.platform.profiles.interfaces.events"};
 
     @Bean
     public TopicExchange eventsExchange() {
@@ -43,7 +43,7 @@ public class MessagingConfiguration {
     @Bean
     @SuppressWarnings("removal")
     public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter(TRUSTED_PACKAGE_PATTERN);
+        return new Jackson2JsonMessageConverter(TRUSTED_PACKAGES);
     }
 
     @Bean
