@@ -13,6 +13,7 @@ import aurora.supply_wok.platform.purchasing.domain.model.valueobjects.EPurchase
 import aurora.supply_wok.platform.purchasing.domain.repositories.PurchaseOrderRepository;
 import aurora.supply_wok.platform.suppliers.interfaces.acl.SuppliersContextFacade;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,6 +26,7 @@ import java.util.Optional;
  * Implementation of the PurchaseOrderCommandService interface.
  */
 @Service
+@Transactional
 public class PurchaseOrderCommandServiceImpl implements PurchaseOrderCommandService {
 
     private final PurchaseOrderRepository purchaseOrderRepository;
